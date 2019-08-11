@@ -1,7 +1,7 @@
 package com.cyxtera.carlostorres.loginapp.view;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,28 +16,36 @@ import com.cyxtera.carlostorres.loginapp.model.pojo.InfoLocation;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListActivity extends AppCompatActivity implements InfoLocationAdapter.ClickListener, Controller.CallbackListener {
-    private SwipeRefreshLayout swipeRefreshLayout;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class ListActivity extends AppCompatActivity implements InfoLocationAdapter.ClickListener, Controller.ListCallbackListener {
+
+    @BindView(R.id.list)
+    RecyclerView recyclerView;
+
+    @BindView(R.id.swipe)
+    SwipeRefreshLayout swipeRefreshLayout;
+
     private List<InfoLocation> infoLocations = new ArrayList<>();
     private InfoLocationAdapter infoLocationAdapter = new InfoLocationAdapter(infoLocations, this);
     private Controller controller;
-    private InfoLocation currentInfo;
+    private String currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        ButterKnife.bind(this);
+
         controller = new Controller(getApplicationContext(), this);
-        controller.setCallbacks(ListActivity.this);
+        controller.setListCallbacks(ListActivity.this);
         configViews();
-        currentInfo = (InfoLocation) getIntent().getSerializableExtra("info");
-        controller.startFetching(currentInfo);
+        currentUser = getIntent().getStringExtra("email");
+        controller.getListOfInfoLocations(currentUser);
     }
 
     private void configViews() {
-        RecyclerView recyclerView = this.findViewById(R.id.list);
-        swipeRefreshLayout = this.findViewById(R.id.swipe);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(ListActivity.this));
         recyclerView.setAdapter(infoLocationAdapter);
 
@@ -48,25 +56,30 @@ public class ListActivity extends AppCompatActivity implements InfoLocationAdapt
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                controller.startFetching(currentInfo);
+                controller.getListOfInfoLocations(currentUser);
+            }
+        });
+        swipeRefreshLayout.setRefreshing(true);
+    }
+
+    @Override
+    public void clicked(final InfoLocation infoLocation) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(ListActivity.this, "Informacion: " + infoLocation.toString(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
+
     @Override
-    public void clicked(InfoLocation infoLocation) {
-        Intent i = new Intent(this, ListActivity.class);
-        i.putExtra("infoLocation", infoLocation);
-        startActivity(i);
+    public void onListProgress(List<InfoLocation> infoLocations) {
+        infoLocationAdapter.addAllInfoLocations(infoLocations);
     }
 
     @Override
-    public void onFetchProgress(InfoLocation location) {
-
-    }
-
-    @Override
-    public void onFetchComplete() {
-
+    public void onListComplete() {
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

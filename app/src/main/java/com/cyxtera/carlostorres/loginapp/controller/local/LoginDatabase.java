@@ -7,25 +7,26 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
 import com.cyxtera.carlostorres.loginapp.model.pojo.InfoLocation;
+import com.cyxtera.carlostorres.loginapp.model.pojo.User;
 
 
-@Database(entities = {InfoLocation.class}, version = 1, exportSchema = false)
-public abstract class InfoLocationDatabase extends RoomDatabase {
+@Database(entities = {InfoLocation.class, User.class}, version = 1, exportSchema = false)
+public abstract class LoginDatabase extends RoomDatabase {
 
-    public abstract InfoLocationDao infoLocationDao();
+    public abstract LoginDao infoLocationDao();
 
-    private static InfoLocationDatabase INSTANCE = null;
+    private static LoginDatabase INSTANCE = null;
 
-    public static InfoLocationDatabase getDatabase(Context context) {
-        InfoLocationDatabase tempInstance = INSTANCE;
+    public static LoginDatabase getDatabase(Context context) {
+        LoginDatabase tempInstance = INSTANCE;
         if (tempInstance != null) {
             return tempInstance;
         }
 
         synchronized(context) {
-            InfoLocationDatabase instance = Room.databaseBuilder(
+            LoginDatabase instance = Room.databaseBuilder(
                     context.getApplicationContext(),
-                    InfoLocationDatabase.class,
+                    LoginDatabase.class,
                     "database")
                     .allowMainThreadQueries()
                     .build();

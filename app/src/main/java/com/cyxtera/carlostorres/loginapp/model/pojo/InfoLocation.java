@@ -1,6 +1,7 @@
 package com.cyxtera.carlostorres.loginapp.model.pojo;
 
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -37,9 +38,9 @@ public class InfoLocation implements Serializable {
     @Expose
     private String email;
 
-    @SerializedName("password")
+    @SerializedName("status")
     @Expose
-    private String password;
+    private String status;
 
     public Integer getId() {
         return id;
@@ -81,11 +82,17 @@ public class InfoLocation implements Serializable {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
+    public String getStatus() {
+        return status;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Id:" + id + " email:" + email + " lat:" + lat + " lng:" + lng + " status:" + status + " time:" + time;
     }
 }

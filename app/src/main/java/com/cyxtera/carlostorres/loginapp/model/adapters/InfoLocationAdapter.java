@@ -1,11 +1,13 @@
 package com.cyxtera.carlostorres.loginapp.model.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cyxtera.carlostorres.loginapp.R;
@@ -13,40 +15,42 @@ import com.cyxtera.carlostorres.loginapp.model.pojo.InfoLocation;
 
 import java.util.List;
 
-public class InfoLocationAdapter extends RecyclerView.Adapter<InfoLocationAdapter.Holder>
-{
+public class InfoLocationAdapter extends RecyclerView.Adapter<InfoLocationAdapter.Holder> {
     private List<InfoLocation> infoLocations;
     private ClickListener clickListener;
+    private Context context;
 
-    public InfoLocationAdapter(List<InfoLocation> infoLocations, ClickListener clickListener)
-    {
+    public InfoLocationAdapter(List<InfoLocation> infoLocations, ClickListener clickListener) {
         this.clickListener = clickListener;
         this.infoLocations = infoLocations;
     }
 
-    public void addAllInfoLocations(List<InfoLocation> infoLocations)
-    {
+    public void addAllInfoLocations(List<InfoLocation> infoLocations) {
         this.infoLocations.clear();
         this.infoLocations.addAll(infoLocations);
         notifyDataSetChanged();
     }
 
     @Override
-    public Holder onCreateViewHolder(ViewGroup parent, int viewType)
-    {
+    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
         View row = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_row, parent, false);
+        context = parent.getContext();
         return new Holder(row);
     }
 
     @Override
-    public void onBindViewHolder(Holder holder, int position)
-    {
+    public void onBindViewHolder(Holder holder, int position) {
         final InfoLocation currentInfoLocation = infoLocations.get(position);
-        holder.mName.setText(currentInfoLocation.getTime());
-        holder.mdate.setText(currentInfoLocation.getLat().toString());
-        holder.mEpisode.setText(currentInfoLocation.getLng().toString());
+        holder.date.setText(currentInfoLocation.getTime());
+        holder.location.setText(currentInfoLocation.getLat().toString() + "," + currentInfoLocation.getLng().toString());
+        holder.status.setText(currentInfoLocation.getStatus());
+        if (currentInfoLocation.getStatus().equals("Exitoso")) {
+            holder.status.setTextColor(ContextCompat.getColor(context, R.color.green));
+        } else {
+            holder.status.setTextColor(ContextCompat.getColor(context, R.color.red));
+        }
 
-        holder.mItem.setOnClickListener(new View.OnClickListener() {
+        holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clickListener.clicked(currentInfoLocation);
@@ -59,18 +63,16 @@ public class InfoLocationAdapter extends RecyclerView.Adapter<InfoLocationAdapte
         return infoLocations.size();
     }
 
-    class Holder extends RecyclerView.ViewHolder
-    {
-        private TextView mName, mdate, mEpisode;
-        private ConstraintLayout mItem;
+    class Holder extends RecyclerView.ViewHolder {
+        private TextView date, status, location;
+        private ConstraintLayout item;
 
-        public Holder(View itemView)
-        {
+        public Holder(View itemView) {
             super(itemView);
-            mName = itemView.findViewById(R.id.name);
-            mdate = itemView.findViewById(R.id.date);
-            mEpisode = itemView.findViewById(R.id.episode);
-            mItem = itemView.findViewById(R.id.layout);
+            date = itemView.findViewById(R.id.date);
+            status = itemView.findViewById(R.id.status);
+            location = itemView.findViewById(R.id.location);
+            item = itemView.findViewById(R.id.layout);
         }
     }
 
